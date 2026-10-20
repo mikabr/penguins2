@@ -1,0 +1,46 @@
+```{r}
+# dataset <- redivis::organization("datapages")$dataset("palmerpenguins")
+# penguins <- dataset$table("penguins")$to_tibble()
+# ojs_define(data = penguins)
+```
+
+```{r}
+# an empty token (e.g. from an unset GitHub secret) would be sent as is,
+# so unset it to access public data anonymously
+if (Sys.getenv("REDIVIS_API_TOKEN") == "") Sys.unsetenv("REDIVIS_API_TOKEN")
+
+library(redivis)
+quarto <- yaml::read_yaml("_quarto.yml")
+
+# load data from redivis table if specified in yaml
+if ("redivis" %in% names(quarto) &&
+    all(c("user", "table") %in% names(quarto$redivis)) && # need user and table
+    any(c("dataset", "workflow") %in% names(quarto$redivis))) { # need dataset or workflow
+  if (!is.null(quarto$redivis$dataset)) {
+    # use dataset if provided
+    dataset <- redivis$user(quarto$redivis$user)$dataset(quarto$redivis$dataset)
+  } else {
+    # otherwise use workflow
+    dataset <- redivis$user(quarto$redivis$user)$workflow(quarto$redivis$workflow)
+  }
+  
+  # get table data
+  table <- dataset$table(quarto$redivis$table)
+  data <- table$to_tibble()
+
+  # get variable metadata, counting distinct values from the data since
+  # variable statistics can't be accessed anonymously
+  vars <- purrr::map(table$list_variables(), \(v) {
+    props <- v$get()$properties
+    c(props, numDistinct = length(unique(na.omit(data[[props$name]]))))
+  })
+
+  # pass to OJS
+  ojs_define(data = data)
+  ojs_define(vars = vars)
+  
+} else {
+  ojs_define(data = NULL)
+  ojs_define(vars = NULL)
+}
+```

@@ -1,0 +1,55 @@
+on:
+  push:
+    branches: main
+  workflow_dispatch:
+
+name: Render and Publish
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-deploy:
+    # in a repo made from this template, the first run is for the template's
+    # own files, so wait for the first customization before building
+    if: github.run_number > 1 || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.5.1'
+          # use the repositories in renv.lock instead of overriding them
+          use-public-rspm: false
+
+      - name: Set up renv
+        uses: r-lib/actions/setup-renv@v2
+
+      - name: Render
+        uses: quarto-dev/quarto-actions/render@v2
+        env:
+          REDIVIS_API_TOKEN: ${{ secrets.REDIVIS_API_TOKEN }}
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
