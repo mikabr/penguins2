@@ -1,13 +1,10 @@
 ---
 about:
-  template: trestles
-  image: images/highlight.jpg
-  image-width: 100%
+  template: jolla
   links:
     - icon: github
       text: GitHub
       href: https://github.com/mikabr/penguins2
-  image-alt: ben
 
 citation:
   type: article-journal

@@ -2,8 +2,6 @@
 title: "Penguins2"
 ---
 
-![](images/highlight.jpg){fig-alt="ben"}
-
 {{< include _load-data.qmd >}}
 
 {{< include _plot-prep.qmd >}}
