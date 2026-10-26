@@ -2,7 +2,7 @@
 
 **Site:** http://mikabr.io/penguins2/
 
-A [datapage](https://github.com/datapages/datapage) for the Redivis dataset [mikabr.penguins2](https://redivis.com/datasets/cafb-9qvcsvrej?v=1.0) (table `penguins`).
+A [datapage](https://github.com/datapages/datapage) for the Redivis dataset [datapages.palmerpenguins](https://stanford.redivis.com/datasets/9g3v-91v2fcg5m?v=1.0) (table `penguins`).
 
 ## Updating the site
 
